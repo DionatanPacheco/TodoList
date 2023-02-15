@@ -33,8 +33,7 @@ class _TodoListFormState extends State<TodoListForm> {
       body: SingleChildScrollView(
         child: Padding(
           padding: const EdgeInsets.all(15.0),
-          child:
-              Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
             const SizedBox(
               height: 10,
             ),
@@ -150,8 +149,7 @@ class _TodoListFormState extends State<TodoListForm> {
                     style: ElevatedButton.styleFrom(
                         padding: const EdgeInsets.all(20),
                         backgroundColor: Colors.redAccent,
-                        shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(10))),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10))),
                     onPressed: () => _validateDate(),
                     child: const Text('Add na Agenda'),
                   )
@@ -189,7 +187,7 @@ class _TodoListFormState extends State<TodoListForm> {
             repeat: _selectedRepeat,
             color: _selectedColor,
             isComplete: 0));
-    print("My id is " "$value");
+    debugPrint("My id is " "$value");
   }
 
   getDateFromUser() async {

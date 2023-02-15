@@ -5,19 +5,11 @@ import 'package:projeto_ge2/models/task.dart';
 class TaskController extends GetxController {
   @override
   Future<void> onReady() async {
-    await getTasks();
     super.onReady();
+    await getTasks();
   }
 
-  /*@override
-  void onInit() async {
-    await _initDB();
-    // ignore: todo
-    // TODO: implement onInit
-    super.onInit();
-  }*/
-
-  var taskList = <Task>[].obs;
+  final taskList = <Task>[].obs;
 
   Future<int> addTask({Task? task}) async {
     return await DBHelper.insert(task);

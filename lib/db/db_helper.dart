@@ -15,12 +15,10 @@ class DBHelper {
 
     try {
       String _path = await getDatabasesPath() + 'tasks.db';
-      print('===== path: $_path');
       _db = await openDatabase(
         _path,
         version: _version,
         onCreate: (db, version) {
-          print('creating a new one');
           return db.execute(
             "CREATE TABLE $_tableName("
             "id INTEGER PRIMARY KEY AUTOINCREMENT, "
@@ -28,36 +26,37 @@ class DBHelper {
             " starTime STRING, "
             "endTime STRING,"
             "remind INTEGER, "
-            "repeat STRING)"
+            "repeat STRING,"
             " color INTEGER, "
-            "isComplete INTEGER,",
+            "isComplete INTEGER)",
           );
         },
       );
     } catch (e) {
-      print(e);
+      throw e.toString();
     }
   }
 
-  static Future<int> insert(Task? task) async {
-    print('insert function called');
-    return await _db?.insert(_tableName, task!.toJson()) ?? 1;
-  }
+  static Future<int> insert(Task? task) async =>
+      await _db?.insert(
+        _tableName,
+        task!.toJson(),
+        conflictAlgorithm: ConflictAlgorithm.replace,
+      ) ??
+      1;
 
-  static Future<List<Map<String, dynamic>>> query() async {
-    print('query function called');
-    return await _db!.query(_tableName);
-  }
+  static Future<List<Map<String, dynamic>>> query() async =>
+      await _db?.query(_tableName) ?? <Map<String, dynamic>>[];
 
-  static delete(Task task) async {
-    return await _db!.delete(_tableName, where: 'id = ?', whereArgs: [task.id]);
-  }
+  static delete(Task task) async =>
+      await _db!.delete(_tableName, where: 'id = ?', whereArgs: [task.id]);
 
-  static update(int id) async {
-    return await _db!.rawUpdate('''
+  static update(int id) async => await _db!.rawUpdate(
+        '''
       UPDATE tasks
       SET isComplete = ?
       WHERE id = ?
-    ''', [1, id]);
-  }
+    ''',
+        [1, id],
+      );
 }

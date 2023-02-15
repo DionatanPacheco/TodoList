@@ -43,7 +43,7 @@ class _TodoListState extends State<TodoList> {
               height: 8,
             ),
             Text(
-              DateFormat.yMMMMd().format(DateTime.now()),
+              DateFormat.yMMMMd('PT').format(DateTime.now()),
               style: const TextStyle(fontSize: 20),
             ),
             const SizedBox(
@@ -56,6 +56,7 @@ class _TodoListState extends State<TodoList> {
             DatePicker(
               height: 100,
               width: 80,
+              locale: 'PT',
               onDateChange: ((selectedDate) {
                 setState(() {
                   selectedDate = selectedDate;
@@ -66,8 +67,7 @@ class _TodoListState extends State<TodoList> {
               initialSelectedDate: DateTime.now(),
               selectionColor: Colors.redAccent,
               dayTextStyle: TextStyle(
-                  fontWeight: FontWeight.bold,
-                  color: Get.isDarkMode ? Colors.white : Colors.black),
+                  fontWeight: FontWeight.bold, color: Get.isDarkMode ? Colors.white : Colors.black),
             ),
             const SizedBox(
               height: 10,
@@ -80,87 +80,91 @@ class _TodoListState extends State<TodoList> {
   }
 
   _showTasks() {
-    return Expanded(child: Obx(
-      () {
-        return ListView.builder(
-            itemCount: _taskController.taskList.length,
-            itemBuilder: (context, index) {
-              Task task = _taskController.taskList[index];
-              print(task.toJson());
-              return AnimationConfiguration.staggeredList(
-                  position: index,
-                  child: SlideAnimation(
-                      child: FadeInAnimation(
-                          child: Row(
-                    children: [
-                      GestureDetector(
-                        onTap: () {
-                          _showBottomSheet(context, task);
-                        },
-                        child: TaskTile(task),
-                      )
-                    ],
-                  ))));
-            });
-      },
+    return Expanded(
+        child: Obx(
+      () => ListView.builder(
+        itemCount: _taskController.taskList.length,
+        itemBuilder: (context, index) {
+          Task task = _taskController.taskList[index];
+          return AnimationConfiguration.staggeredList(
+            position: index,
+            child: SlideAnimation(
+              child: FadeInAnimation(
+                child: GestureDetector(
+                  onTap: () {
+                    _showBottomSheet(context, task);
+                  },
+                  child: TaskTile(task: task),
+                ),
+              ),
+            ),
+          );
+        },
+      ),
     ));
   }
 }
 
 _showBottomSheet(BuildContext context, Task task) {
-  Get.bottomSheet(Container(
-    padding: const EdgeInsets.only(top: 4),
-    height: task.isComplete == 1
-        ? MediaQuery.of(context).size.height * 0.24
-        : MediaQuery.of(context).size.height * 0.32,
-    color: Get.isDarkMode ? Colors.grey : Colors.white,
-    child: Column(
-      children: [
-        Container(
-          height: 6,
-          width: 120,
-          decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(10), color: Colors.grey[300]),
-        ),
-        const Spacer(),
-        task.isComplete == 1
-            ? Container()
-            : _bottonSheetButton(
-                context: context,
-                clr: Colors.blue,
-                label: "Atividade Realizada",
-                onTap: () {
-                  var taskController = Get.put(TaskController());
-                  taskController.markTaskCompleted(task.id!);
+  Get.bottomSheet(
+    SafeArea(
+      child: Container(
+        padding: const EdgeInsets.only(top: 4),
+        height: task.isComplete == 1
+            ? MediaQuery.of(context).size.height * 0.24
+            : MediaQuery.of(context).size.height * 0.32,
+        color: Get.isDarkMode ? Colors.grey : Colors.white,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              height: 6,
+              width: 120,
+              decoration:
+                  BoxDecoration(borderRadius: BorderRadius.circular(10), color: Colors.grey[300]),
+            ),
+            const SizedBox(height: 50),
+            task.isComplete == 1
+                ? Container()
+                : _bottonSheetButton(
+                    context: context,
+                    clr: Colors.blue,
+                    label: "Atividade Realizada",
+                    onTap: () {
+                      var taskController = Get.put(TaskController());
+                      taskController.markTaskCompleted(task.id!);
 
+                      Get.back();
+                    },
+                  ),
+            _bottonSheetButton(
+              context: context,
+              clr: Colors.red,
+              label: "Deletar",
+              onTap: () {
+                var taskController = Get.put(TaskController());
+                taskController.delete(task);
+
+                Get.back();
+              },
+            ),
+            const SizedBox(
+              height: 20,
+            ),
+            _bottonSheetButton(
+                context: context,
+                clr: Colors.white,
+                label: "Fechar",
+                onTap: () {
                   Get.back();
                 },
-              ),
-        _bottonSheetButton(
-          context: context,
-          clr: Colors.red,
-          label: "Deletar",
-          onTap: () {
-            var taskController = Get.put(TaskController());
-            taskController.delete(task);
-
-            Get.back();
-          },
+                isClose: true)
+          ],
         ),
-        const SizedBox(
-          height: 20,
-        ),
-        _bottonSheetButton(
-            context: context,
-            clr: Colors.white,
-            label: "Fechar",
-            onTap: () {
-              Get.back();
-            },
-            isClose: true)
-      ],
+      ),
     ),
-  ));
+    backgroundColor: Get.isDarkMode ? Colors.grey : Colors.white,
+  );
 }
 
 _bottonSheetButton(
@@ -170,29 +174,29 @@ _bottonSheetButton(
     bool isClose = false,
     required BuildContext context}) {
   return GestureDetector(
-      onTap: onTap,
-      child: Container(
-          margin: const EdgeInsets.symmetric(vertical: 4),
-          height: 55,
-          width: MediaQuery.of(context).size.width * 0.9,
-          decoration: BoxDecoration(
-            border: Border.all(
-              width: 2,
-              color: isClose == true
-                  ? Get.isDarkMode
-                      ? Colors.grey[600]!
-                      : Colors.grey[300]!
-                  : clr,
-            ),
-            borderRadius: BorderRadius.circular(20),
-            color: isClose == true ? Colors.transparent : clr,
-          ),
-          child: Center(
-            child: Text(
-              label,
-              style: isClose
-                  ? titleStyle
-                  : titleStyle.copyWith(color: Colors.white),
-            ),
-          )));
+    onTap: onTap,
+    child: Container(
+      margin: const EdgeInsets.symmetric(vertical: 4),
+      height: 55,
+      width: MediaQuery.of(context).size.width * 0.9,
+      decoration: BoxDecoration(
+        border: Border.all(
+          width: 2,
+          color: isClose == true
+              ? Get.isDarkMode
+                  ? Colors.grey[600]!
+                  : Colors.grey[300]!
+              : clr,
+        ),
+        borderRadius: BorderRadius.circular(20),
+        color: isClose == true ? Colors.transparent : clr,
+      ),
+      child: Center(
+        child: Text(
+          label,
+          style: isClose ? titleStyle : titleStyle.copyWith(color: Colors.white),
+        ),
+      ),
+    ),
+  );
 }
