@@ -43,7 +43,7 @@ class _TodoListState extends State<TodoList> {
               height: 8,
             ),
             Text(
-              DateFormat.yMMMMd('PT').format(DateTime.now()),
+              DateFormat.yMMMMd('Pt').format(DateTime.now()),
               style: const TextStyle(fontSize: 20),
             ),
             const SizedBox(
